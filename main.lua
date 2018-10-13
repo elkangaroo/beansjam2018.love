@@ -1,6 +1,7 @@
 local app = {}
 app.version = 0.1
 app.camera = nil
+app.screen = {}
 app.entities = {}
 app.audio = {
   volume = 1.0,
@@ -12,6 +13,11 @@ app.audio = {
 function love.load(...)
   app.camera = require('lib.camera')
 
+  app.screen.width = love.graphics.getWidth()
+  app.screen.height = love.graphics.getHeight()
+  app.screen.centerX = app.screen.width / 2
+  app.screen.centerY = app.screen.height / 2
+
   app.audio.background = love.audio.newSource(
     'resources/' .. app.audio.tracks[math.random(#app.audio.tracks)],
     'stream'
@@ -21,8 +27,29 @@ function love.load(...)
 
   love.audio.play(app.audio.background)
 
-	player = {x=250, y=250, width=15, height=15}
-	enemy = {x=300, y=400, width=15, height=15}
+	player = { x = app.screen.centerX - 25, y = 400, width = 50, height = 50 }
+
+  for i = .5, 2, .5 do
+    local rectangles = {}
+
+    for j = 1, math.random(2, 15) do
+      table.insert(rectangles, {
+        math.random(0, 1600),
+        math.random(0, 1600),
+        math.random(50, 400),
+        math.random(50, 400),
+        color = { math.random(), math.random(), math.random() }
+      })
+    end
+
+    camera:newLayer(i, function()
+      for _, v in ipairs(rectangles) do
+        love.graphics.setColor(v.color)
+        love.graphics.rectangle('fill', unpack(v))
+        love.graphics.setColor(1, 1, 1)
+      end
+    end)
+  end
 end
 
 function love.update(dt)
@@ -30,28 +57,18 @@ function love.update(dt)
 end
 
 function love.draw()
-  app.camera:set()
+  love.graphics.print("FPS: " .. love.timer.getFPS(), 2, 2)
+  app.camera:draw()
 
-  love.graphics.push()
-    love.graphics.setColor(85/255, 190/255, 240/255)
-    love.graphics.print([[
-      mouse : move camera
-      m     : toggle music
-      esc   : quit
-    ]], 10, 10)
-  love.graphics.pop()
+  app:drawTextCentered([[
+    Touch to play.
+    Swipe to move camera.
+  ]], { 0.3, 0.75, 0.95, 1 })
 
   love.graphics.push()
     love.graphics.setColor(1, 1, 1)
   	love.graphics.rectangle("fill",  player.x, player.y, player.width, player.height)
   love.graphics.pop()
-
-  love.graphics.push()
-    love.graphics.setColor(1, 0, 0)
-    love.graphics.rectangle("fill",  enemy.x, enemy.y, enemy.width, enemy.height)
-  love.graphics.pop()
-
-  app.camera:unset()
 end
 
 function love.focus(focused)
@@ -88,14 +105,14 @@ end
 function love.mousemoved(x, y, dx, dy, istouch)
   print('mouse move ' .. dx .. dy)
 
-  app.camera:move(-dx, -dy)
+  app.camera:move(-dx, 0)
 end
 
 function love.wheelmoved(dx, dy)
   print('wheel move ' .. dx .. dy)
 
   if dy ~= 0 then
-    app.camera:scale(1 - (-dy * 0.1))
+    app.camera:scale(1 - (dy * 0.1))
   end
 end
 
@@ -109,4 +126,16 @@ end
 
 function love.touchmoved(id, x, y, dx, dy, pressure)
 
+end
+
+function app:drawTextCentered(text, color)
+  love.graphics.push()
+    limit = app.screen.width - 100
+    font = love.graphics.getFont()
+    _, lines = font:getWrap(text, limit)
+    x, y = app.screen.centerX - limit / 2, app.screen.centerY - font:getHeight() * #lines / 2
+
+    love.graphics.setColor(color)
+    love.graphics.printf(text, x, y, limit, "center")
+  love.graphics.pop()
 end

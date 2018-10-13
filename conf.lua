@@ -3,8 +3,8 @@ function love.conf(t)
   t.console = false
 
   t.window.title = "a lövely summertime blues"
-  t.window.width = 576
-  t.window.height = 1024
+  t.window.width = 1080
+  t.window.height = 1920
 
   t.accelerometerjoystick = true
   t.audio.mixwithsystem = false

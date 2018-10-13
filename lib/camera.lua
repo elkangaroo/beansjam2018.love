@@ -4,6 +4,7 @@ camera.y = 0
 camera.scaleX = 1
 camera.scaleY = 1
 camera.rotation = 0
+camera.layers = {}
 
 function camera:set()
   love.graphics.push()
@@ -39,6 +40,25 @@ end
 function camera:setScale(sx, sy)
   self.scaleX = sx or self.scaleX
   self.scaleY = sy or self.scaleY
+end
+
+function camera:newLayer(scale, drawFunc)
+  table.insert(self.layers, { scale = scale, draw = drawFunc })
+  table.sort(self.layers, function(a, b) return a.scale < b.scale end)
+end
+
+function camera:draw()
+  local bx, by = self.x, self.y
+
+  for _, layer in ipairs(self.layers) do
+    self.x = bx * layer.scale
+    self.y = by * layer.scale
+    camera:set()
+    layer.draw()
+    camera:unset()
+  end
+
+  self.x, self.y = bx, by
 end
 
 return camera
