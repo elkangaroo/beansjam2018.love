@@ -34,10 +34,10 @@ function love.load(...)
 
     for j = 1, math.random(2, 15) do
       table.insert(rectangles, {
-        math.random(0, 1600),
-        math.random(0, 1600),
-        math.random(50, 400),
-        math.random(50, 400),
+        math.random(-2 * app.screen.width, 2 * app.screen.width),
+        math.random(0, app.screen.height),
+        math.random(20, 200),
+        math.random(20, 200),
         color = { math.random(), math.random(), math.random() }
       })
     end
@@ -53,7 +53,7 @@ function love.load(...)
 end
 
 function love.update(dt)
-
+  -- camera:setPosition(love.mouse.getX() * 2, love.mouse.getY() * 2)
 end
 
 function love.draw()
