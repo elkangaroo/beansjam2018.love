@@ -4,10 +4,7 @@ app.camera = nil
 app.screen = {}
 app.entities = {}
 app.audio = {
-  volume = 1.0,
-  tracks = {
-    'summertime.mp3'
-  }
+  volume = 1.0
 }
 app.images = {
   bgSpeed = 100
@@ -23,10 +20,7 @@ function love.load(...)
   app.screen.centerX = app.screen.width / 2
   app.screen.centerY = app.screen.height / 2
 
-  app.audio.bg = love.audio.newSource(
-    'resources/' .. app.audio.tracks[math.random(#app.audio.tracks)],
-    'stream'
-  )
+  app.audio.bg = love.audio.newSource('resources/bgmusic.mp3', 'stream')
   app.audio.bg:setVolume(app.audio.volume)
   app.audio.bg:setLooping(true)
 
@@ -71,9 +65,10 @@ function love.draw()
   app:drawTextCentered([[
     Touch to play.
     Swipe to move camera.
-  ]], { 0.3, 0.75, 0.95, 1 })
+  ]], { 1, 1, 1 })
 
-  love.graphics.print("FPS: " .. love.timer.getFPS(), 2, 2)
+  love.graphics.setColor(0.3, 0.9, 1)
+  love.graphics.print('v' .. app.version .. ' FPS: ' .. love.timer.getFPS(), 2, 2)
 end
 
 function love.focus(focused)
