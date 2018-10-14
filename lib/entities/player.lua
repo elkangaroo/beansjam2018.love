@@ -4,6 +4,7 @@ player.state = nil
 player.animationSpeed = 6
 player.animations = {}
 player.position = { x = nil, y = nil}
+player.alive = true
 
 local animator = require('lib.animator')
 
@@ -29,6 +30,9 @@ function player:load(position, scale)
 
   self.animations[STATE_DIE] = animator.newAnimation(playerImageGrid('1-10', STATE_DIE), 1, playerImage)
   self.animations[STATE_DIE]:setPauseAtEnd(true)
+  self.animations[STATE_DIE]:setOnAnimationChange(function(anim, frame)
+    player.alive = (frame < 10)
+  end)
 end
 
 function player:update(dt)
@@ -52,8 +56,16 @@ function player:mousepressed(x, y, button)
   end
 end
 
+function player:isIdle()
+  return STATE_IDLE == self.state
+end
+
 function player:isWalking()
   return STATE_WALK == self.state
+end
+
+function player:isDead()
+  return STATE_DIE == self.state and not self.alive
 end
 
 return player

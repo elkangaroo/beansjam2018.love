@@ -76,7 +76,13 @@ function love.draw()
   app.camera:draw()
   app.entities.player:draw()
 
-  app:drawTextCentered('Touch to play.', { 1, 1, 1 })
+  if app.entities.player:isIdle() then
+    app:drawTextCentered('Touch to play.', { 1, 1, 1 })
+  end
+
+  if app.entities.player:isDead() then
+    app:drawTextCentered('Game Over.', { 1, 1, 1 })
+  end
 
   love.graphics.setColor(0.3, 0.9, 1)
   love.graphics.setFont(app.fonts.small)
