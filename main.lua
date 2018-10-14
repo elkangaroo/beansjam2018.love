@@ -1,19 +1,18 @@
 local app = {}
 app.version = 0.1
-app.camera = nil
+app.camera = require('lib.camera')
+app.animator = require('lib.animator')
 app.screen = {}
 app.entities = {}
 app.audio = {
-  volume = 1.0
+  volume = 0.5
 }
 app.images = {
-  bgSpeed = 100
+  bgSpeed = 30
 }
 
 function love.load(...)
   love.graphics.setDefaultFilter('nearest', 'nearest')
-
-  app.camera = require('lib.camera')
 
   app.screen.width = love.graphics.getWidth()
   app.screen.height = love.graphics.getHeight()
@@ -35,32 +34,42 @@ function love.load(...)
   app.images.bg.back:setWrap('repeat')
   app.images.bg.front:setWrap('repeat')
 
+  local bgHeight = 192
+  local bgScale = app.screen.height / bgHeight
+
   camera:newLayer(0.33, function()
-    quad = love.graphics.newQuad(0, 0, app.screen.width * 10, app.screen.height, 256, 192)
-    love.graphics.draw(app.images.bg.far, quad, 0, 0, 0, app.screen.height / 192)
+    quad = love.graphics.newQuad(0, 0, app.screen.width * 100, app.screen.height, 256, bgHeight)
+    love.graphics.draw(app.images.bg.far, quad, 0, 0, 0, bgScale)
   end)
 
   camera:newLayer(0.66, function()
-    quad = love.graphics.newQuad(0, 0, app.screen.width * 10, app.screen.height, 256, 192)
-    love.graphics.draw(app.images.bg.back, quad, 0, 0, 0, app.screen.height / 192)
+    quad = love.graphics.newQuad(0, 0, app.screen.width * 100, app.screen.height, 256, bgHeight)
+    love.graphics.draw(app.images.bg.back, quad, 0, 0, 0, bgScale)
   end)
 
   camera:newLayer(1, function()
-    quad = love.graphics.newQuad(0, 0, app.screen.width * 10, app.screen.height, 352, 192)
-    love.graphics.draw(app.images.bg.front, quad, 0, 0, 0, app.screen.height / 192)
+    quad = love.graphics.newQuad(0, 0, app.screen.width * 100, app.screen.height, 352, bgHeight)
+    love.graphics.draw(app.images.bg.front, quad, 0, 0, 0, bgScale)
   end)
+
+  app.entities.player = require('lib.entities.player')
+  app.entities.player:load({ x = app.screen.centerX, y = app.screen.height - 134})
 end
 
 function love.update(dt)
-  local moveX = app.images.bgSpeed * dt
+  if app.entities.player:isWalking() then
+    local moveX = app.images.bgSpeed * dt
+    app.camera:move(moveX, 0)
+  end
 
-  app.camera:move(moveX, 0)
-  -- camera:setPosition(love.mouse.getX() * 2, love.mouse.getY() * 2)
+  app.entities.player:update(dt)
 end
 
 function love.draw()
   love.graphics.setColor(1, 1, 1)
+
   app.camera:draw()
+  app.entities.player:draw()
 
   app:drawTextCentered([[
     Touch to play.
@@ -81,6 +90,8 @@ end
 
 function love.keypressed(key, scancode, isrepeat)
   print('key ' .. key)
+
+  app.entities.player:keypressed(key)
 
   if 'm' == key then
     app.audio.bg:setVolume(app.audio.bg:getVolume() == 0.0 and app.audio.volume or 0.0)
@@ -105,14 +116,16 @@ end
 function love.mousemoved(x, y, dx, dy, istouch)
   print('mouse move ' .. dx .. dy)
 
-  app.camera:move(-dx, 0)
+  if dx < 0 then
+    -- app.camera:move(-dx, 0)
+  end
 end
 
 function love.wheelmoved(dx, dy)
   print('wheel move ' .. dx .. dy)
 
   if dy ~= 0 then
-    app.camera:scale(1 - (dy * 0.1))
+    -- app.camera:scale(1 - (dy * 0.1))
   end
 end
 
