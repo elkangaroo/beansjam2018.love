@@ -12,6 +12,7 @@ Every now and then, he/she is confronted with a a dilemma and needs to decide fo
 * Background music, created by Vault Kid [https://opengameart.org/content/vault-kid]
 * Background image "Cyberpunk Street Environment", created by ansimuz.com [https://opengameart.org/content/cyberpunk-street-environment]
 * Animated Night Thief, created by Calciumtrice [https://opengameart.org/content/night-thief]
+* Font "Boxy Bold", created by Clint Bellanger [https://opengameart.org/content/boxy-bold-truetype-font]
 
 ### Libraries
 * Löve camera module based on a tutorial series by Michael Ebens [http://ebens.me/2011/04/19/cameras-in-love2d-part-1-the-basics/] [http://ebens.me/2011/04/22/cameras-in-love2d-part-2-parallax-scrolling/]

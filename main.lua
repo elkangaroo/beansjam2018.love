@@ -10,9 +10,14 @@ app.audio = {
 app.images = {
   bgSpeed = 40
 }
+app.fonts = {}
 
 function love.load(...)
   love.graphics.setDefaultFilter('nearest', 'nearest')
+
+  app.fonts.small = love.graphics.newFont('resources/boxy_bold.ttf', 16)
+  app.fonts.medium = love.graphics.newFont('resources/boxy_bold.ttf', 32)
+  app.fonts.large = love.graphics.newFont('resources/boxy_bold.ttf', 64)
 
   app.screen.width = love.graphics.getWidth()
   app.screen.height = love.graphics.getHeight()
@@ -71,12 +76,10 @@ function love.draw()
   app.camera:draw()
   app.entities.player:draw()
 
-  app:drawTextCentered([[
-    Touch to play.
-    Swipe to move camera faster.
-  ]], { 1, 1, 1 }, 16)
+  app:drawTextCentered('Touch to play.', { 1, 1, 1 })
 
   love.graphics.setColor(0.3, 0.9, 1)
+  love.graphics.setFont(app.fonts.small)
   love.graphics.print('v' .. app.version .. ' FPS: ' .. love.timer.getFPS(), 2, 2)
 end
 
@@ -153,6 +156,7 @@ function app:drawTextCentered(text, color, y)
     x, y = app.screen.centerX - limit / 2, y or app.screen.centerY - font:getHeight() * #lines / 2
 
     love.graphics.setColor(color)
+    love.graphics.setFont(app.fonts.medium)
     love.graphics.printf(text, x, y, limit, "center")
   love.graphics.pop()
 end
