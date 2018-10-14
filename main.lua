@@ -9,8 +9,13 @@ app.audio = {
     'summertime.mp3'
   }
 }
+app.images = {
+  bgSpeed = 100
+}
 
 function love.load(...)
+  love.graphics.setDefaultFilter('nearest', 'nearest')
+
   app.camera = require('lib.camera')
 
   app.screen.width = love.graphics.getWidth()
@@ -18,46 +23,49 @@ function love.load(...)
   app.screen.centerX = app.screen.width / 2
   app.screen.centerY = app.screen.height / 2
 
-  app.audio.background = love.audio.newSource(
+  app.audio.bg = love.audio.newSource(
     'resources/' .. app.audio.tracks[math.random(#app.audio.tracks)],
     'stream'
   )
-  app.audio.background:setVolume(app.audio.volume)
-  app.audio.background:setLooping(true)
+  app.audio.bg:setVolume(app.audio.volume)
+  app.audio.bg:setLooping(true)
 
-  love.audio.play(app.audio.background)
+  love.audio.play(app.audio.bg)
 
-	player = { x = app.screen.centerX - 25, y = 400, width = 50, height = 50 }
+  app.images.bg = {
+    far = love.graphics.newImage('resources/cyberpunk_buildings_far.png'),
+    back = love.graphics.newImage('resources/cyberpunk_buildings_back.png'),
+    front = love.graphics.newImage('resources/cyberpunk_buildings_front.png')
+  }
+  app.images.bg.far:setWrap('repeat')
+  app.images.bg.back:setWrap('repeat')
+  app.images.bg.front:setWrap('repeat')
 
-  for i = .5, 2, .5 do
-    local rectangles = {}
+  camera:newLayer(0.33, function()
+    quad = love.graphics.newQuad(0, 0, app.screen.width * 10, app.screen.height, 256, 192)
+    love.graphics.draw(app.images.bg.far, quad, 0, 0, 0, app.screen.height / 192)
+  end)
 
-    for j = 1, math.random(2, 15) do
-      table.insert(rectangles, {
-        math.random(-2 * app.screen.width, 2 * app.screen.width),
-        math.random(0, app.screen.height),
-        math.random(20, 200),
-        math.random(20, 200),
-        color = { math.random(), math.random(), math.random() }
-      })
-    end
+  camera:newLayer(0.66, function()
+    quad = love.graphics.newQuad(0, 0, app.screen.width * 10, app.screen.height, 256, 192)
+    love.graphics.draw(app.images.bg.back, quad, 0, 0, 0, app.screen.height / 192)
+  end)
 
-    camera:newLayer(i, function()
-      for _, v in ipairs(rectangles) do
-        love.graphics.setColor(v.color)
-        love.graphics.rectangle('fill', unpack(v))
-        love.graphics.setColor(1, 1, 1)
-      end
-    end)
-  end
+  camera:newLayer(1, function()
+    quad = love.graphics.newQuad(0, 0, app.screen.width * 10, app.screen.height, 352, 192)
+    love.graphics.draw(app.images.bg.front, quad, 0, 0, 0, app.screen.height / 192)
+  end)
 end
 
 function love.update(dt)
+  local moveX = app.images.bgSpeed * dt
+
+  app.camera:move(moveX, 0)
   -- camera:setPosition(love.mouse.getX() * 2, love.mouse.getY() * 2)
 end
 
 function love.draw()
-  love.graphics.print("FPS: " .. love.timer.getFPS(), 2, 2)
+  love.graphics.setColor(1, 1, 1)
   app.camera:draw()
 
   app:drawTextCentered([[
@@ -65,14 +73,11 @@ function love.draw()
     Swipe to move camera.
   ]], { 0.3, 0.75, 0.95, 1 })
 
-  love.graphics.push()
-    love.graphics.setColor(1, 1, 1)
-  	love.graphics.rectangle("fill",  player.x, player.y, player.width, player.height)
-  love.graphics.pop()
+  love.graphics.print("FPS: " .. love.timer.getFPS(), 2, 2)
 end
 
 function love.focus(focused)
-  app.audio.background:setVolume(focused and app.audio.volume or 0.0)
+  app.audio.bg:setVolume(focused and app.audio.volume or 0.0)
 end
 
 function love.quit()
@@ -83,7 +88,7 @@ function love.keypressed(key, scancode, isrepeat)
   print('key ' .. key)
 
   if 'm' == key then
-    app.audio.background:setVolume(app.audio.background:getVolume() == 0.0 and app.audio.volume or 0.0)
+    app.audio.bg:setVolume(app.audio.bg:getVolume() == 0.0 and app.audio.volume or 0.0)
   end
   if 'escape' == key then
     love.event.push('quit')

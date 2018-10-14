@@ -8,4 +8,13 @@ A man/woman with a fedora (hat) is slowly walking down a street in the dark.
 Every now and then, he/she is confronted with a a dilemma and needs to decide for one of two possible options.
 
 ## Resources
-* Background music "Summertime" by StefanMo [https://opengameart.org/content/summertime-blues-beansjam]
+### Assets
+* Background music "Summertime", created by StefanMo [https://opengameart.org/content/summertime-blues-beansjam]
+* Background image "Cyberpunk Street Environment", created by ansimuz.com [https://opengameart.org/content/cyberpunk-street-environment]
+
+### Docs
+* Löve camera module based on a tutorial series by Michael Ebens [http://ebens.me/2011/04/19/cameras-in-love2d-part-1-the-basics/] [http://ebens.me/2011/04/22/cameras-in-love2d-part-2-parallax-scrolling/]
+* Löve keys reference [https://love2d.org/wiki/KeyConstant]
+* Löve callbacks reference [https://love2d.org/wiki/Category:Callbacks]
+* Collection of Löve libraries & resources [https://github.com/love2d-community/awesome-love2d]
+* Game packaging for Android [https://bitbucket.org/MartinFelis/love-android-sdl2/wiki/Game_Packaging]
