@@ -1,5 +1,5 @@
 player = {}
-player.scale = 4
+player.scale = 1
 player.state = nil
 player.animationSpeed = 6
 player.animations = {}
@@ -13,9 +13,10 @@ local STATE_WALK = 3
 local STATE_STAB = 4
 local STATE_DIE = 5
 
-function player:load(position)
+function player:load(position, scale)
   self.state = STATE_IDLE
   self.position = position
+  self.scale = scale or 1
 
   local playerImage = love.graphics.newImage('resources/night_thief.png')
   local playerImageGrid = animator.newGrid(32, 32, playerImage)
@@ -42,6 +43,12 @@ function player:keypressed(key)
   if self.animations[tonumber(key)] then
     self.animations[tonumber(key)]:restart()
     self.state = tonumber(key)
+  end
+end
+
+function player:mousepressed(x, y, button)
+  if 1 == button then
+    self.state = self.state == STATE_WALK and STATE_IDLE or STATE_WALK
   end
 end
 

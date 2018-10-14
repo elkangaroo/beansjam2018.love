@@ -8,7 +8,7 @@ app.audio = {
   volume = 0.5
 }
 app.images = {
-  bgSpeed = 30
+  bgSpeed = 40
 }
 
 function love.load(...)
@@ -35,25 +35,25 @@ function love.load(...)
   app.images.bg.front:setWrap('repeat')
 
   local bgHeight = 192
-  local bgScale = app.screen.height / bgHeight
+  local scale = app.screen.height / bgHeight
 
   camera:newLayer(0.33, function()
-    quad = love.graphics.newQuad(0, 0, app.screen.width * 100, app.screen.height, 256, bgHeight)
-    love.graphics.draw(app.images.bg.far, quad, 0, 0, 0, bgScale)
+    quad = love.graphics.newQuad(0, 0, app.screen.width * 100, bgHeight, 256, bgHeight)
+    love.graphics.draw(app.images.bg.far, quad, 0, 0, 0, scale)
   end)
 
   camera:newLayer(0.66, function()
-    quad = love.graphics.newQuad(0, 0, app.screen.width * 100, app.screen.height, 256, bgHeight)
-    love.graphics.draw(app.images.bg.back, quad, 0, 0, 0, bgScale)
+    quad = love.graphics.newQuad(0, 0, app.screen.width * 100, bgHeight, 256, bgHeight)
+    love.graphics.draw(app.images.bg.back, quad, 0, 0, 0, scale)
   end)
 
   camera:newLayer(1, function()
-    quad = love.graphics.newQuad(0, 0, app.screen.width * 100, app.screen.height, 352, bgHeight)
-    love.graphics.draw(app.images.bg.front, quad, 0, 0, 0, bgScale)
+    quad = love.graphics.newQuad(0, 0, app.screen.width * 100, bgHeight, 352, bgHeight)
+    love.graphics.draw(app.images.bg.front, quad, 0, 0, 0, scale)
   end)
 
   app.entities.player = require('lib.entities.player')
-  app.entities.player:load({ x = app.screen.centerX, y = app.screen.height - 134})
+  app.entities.player:load({ x = app.screen.centerX, y = app.screen.height - 134}, scale)
 end
 
 function love.update(dt)
@@ -73,8 +73,8 @@ function love.draw()
 
   app:drawTextCentered([[
     Touch to play.
-    Swipe to move camera.
-  ]], { 1, 1, 1 })
+    Swipe to move camera faster.
+  ]], { 1, 1, 1 }, 16)
 
   love.graphics.setColor(0.3, 0.9, 1)
   love.graphics.print('v' .. app.version .. ' FPS: ' .. love.timer.getFPS(), 2, 2)
@@ -107,6 +107,8 @@ end
 
 function love.mousepressed(x, y, button, istouch, presses)
   print('mouse ' .. button)
+
+  app.entities.player:mousepressed(x, y, button)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
@@ -116,8 +118,10 @@ end
 function love.mousemoved(x, y, dx, dy, istouch)
   print('mouse move ' .. dx .. dy)
 
-  if dx < 0 then
-    -- app.camera:move(-dx, 0)
+  if app.entities.player:isWalking() then
+    if dx < 0 then
+      app.camera:move(-dx, 0)
+    end
   end
 end
 
@@ -141,12 +145,12 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 
 end
 
-function app:drawTextCentered(text, color)
+function app:drawTextCentered(text, color, y)
   love.graphics.push()
-    limit = app.screen.width - 100
+    limit = app.screen.width
     font = love.graphics.getFont()
     _, lines = font:getWrap(text, limit)
-    x, y = app.screen.centerX - limit / 2, app.screen.centerY - font:getHeight() * #lines / 2
+    x, y = app.screen.centerX - limit / 2, y or app.screen.centerY - font:getHeight() * #lines / 2
 
     love.graphics.setColor(color)
     love.graphics.printf(text, x, y, limit, "center")
