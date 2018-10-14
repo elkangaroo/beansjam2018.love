@@ -35,24 +35,21 @@ function player:load(position, scale)
   end)
 end
 
-function player:update(dt)
+function player:update(dt, isGameOver)
   self.animations[self.state]:update(self.animationSpeed * dt)
+
+  if (isGameOver and self:isWalking()) then
+    self.state = STATE_DIE
+  end
 end
 
 function player:draw()
   self.animations[self.state]:draw(self.position.x - 32 * self.scale / 2, self.position.y - 32 * self.scale, 0, self.scale, self.scale)
 end
 
-function player:keypressed(key)
-  if self.animations[tonumber(key)] then
-    self.animations[tonumber(key)]:restart()
-    self.state = tonumber(key)
-  end
-end
-
 function player:mousepressed(x, y, button)
-  if 1 == button then
-    self.state = self.state == STATE_WALK and STATE_IDLE or STATE_WALK
+  if 1 == button and self:isIdle() or self:isWalking() then
+    self.state = self:isWalking() and STATE_IDLE or STATE_WALK
   end
 end
 

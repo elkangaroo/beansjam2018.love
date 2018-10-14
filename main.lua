@@ -1,5 +1,5 @@
 local app = {}
-app.version = 0.1
+app.version = 1.0
 app.camera = require('lib.camera')
 app.animator = require('lib.animator')
 app.screen = {}
@@ -11,9 +11,20 @@ app.images = {
   bgSpeed = 40
 }
 app.fonts = {}
+app.timer = 0
+app.timerMax = 0
+
+-- Initialize the pseudo random number generator
+math.randomseed(os.time())
+math.random()
+math.random()
+math.random()
 
 function love.load(...)
   love.graphics.setDefaultFilter('nearest', 'nearest')
+
+  app.timer = 0
+  app.timerMax = math.random(30)
 
   app.fonts.small = love.graphics.newFont('resources/boxy_bold.ttf', 16)
   app.fonts.medium = love.graphics.newFont('resources/boxy_bold.ttf', 32)
@@ -63,11 +74,11 @@ end
 
 function love.update(dt)
   if app.entities.player:isWalking() then
-    local moveX = app.images.bgSpeed * dt
-    app.camera:move(moveX, 0)
+    app.timer = app.timer + dt
+    app.camera:move(app.images.bgSpeed * dt, 0)
   end
 
-  app.entities.player:update(dt)
+  app.entities.player:update(dt, app.timer > app.timerMax)
 end
 
 function love.draw()
@@ -86,7 +97,7 @@ function love.draw()
 
   love.graphics.setColor(0.3, 0.9, 1)
   love.graphics.setFont(app.fonts.small)
-  love.graphics.print('v' .. app.version .. ' FPS: ' .. love.timer.getFPS(), 2, 2)
+  love.graphics.print(string.format('v%s FPS: %s Time: %s', app.version, love.timer.getFPS(), (math.floor(app.timer * 10) * 0.1)), 2, 2)
 end
 
 function love.focus(focused)
@@ -98,13 +109,6 @@ function love.quit()
 end
 
 function love.keypressed(key, scancode, isrepeat)
-  print('key ' .. key)
-
-  app.entities.player:keypressed(key)
-
-  if 'm' == key then
-    app.audio.bg:setVolume(app.audio.bg:getVolume() == 0.0 and app.audio.volume or 0.0)
-  end
   if 'escape' == key then
     love.event.push('quit')
   end
@@ -115,8 +119,6 @@ function love.keyreleased(key, scancode)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-  print('mouse ' .. button)
-
   app.entities.player:mousepressed(x, y, button)
 end
 
@@ -125,21 +127,11 @@ function love.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
-  print('mouse move ' .. dx .. dy)
 
-  if app.entities.player:isWalking() then
-    if dx < 0 then
-      app.camera:move(-dx, 0)
-    end
-  end
 end
 
 function love.wheelmoved(dx, dy)
-  print('wheel move ' .. dx .. dy)
 
-  if dy ~= 0 then
-    -- app.camera:scale(1 - (dy * 0.1))
-  end
 end
 
 function love.touchpressed(id, x, y, dx, dy, pressure)
